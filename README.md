@@ -2,8 +2,8 @@
 
 A premium, full-featured Job Portal application built using **React (Vite)**, **Tailwind CSS**, **Supabase**, and **Clerk**. Hirrd provides a seamless, secure, and beautiful platform connecting top recruiters with talented candidates.
 
-![Hirrd Landing Page Preview <img width="1718" height="916" alt="banner" src="https://github.com/user-attachments/assets/2abaf3e0-ee5e-4443-9add-bb10afcc3b4d" />
-)
+ <img width="1718" height="916" alt="banner" src="https://github.com/user-attachments/assets/2abaf3e0-ee5e-4443-9add-bb10afcc3b4d" />
+
 
 ---
 
