@@ -1,8 +1,9 @@
-# Hirrd (Get Placed) - Modern Full-Stack Job Portal
+# Get Placed - Modern Full-Stack Job Portal
 
 A premium, full-featured Job Portal application built using **React (Vite)**, **Tailwind CSS**, **Supabase**, and **Clerk**. Hirrd provides a seamless, secure, and beautiful platform connecting top recruiters with talented candidates.
 
-![Hirrd Landing Page Preview](https://github.com/user-attachments/assets/1da23b25-1f29-4402-be74-03685d9b732d)
+![Hirrd Landing Page Preview <img width="1718" height="916" alt="banner" src="https://github.com/user-attachments/assets/2abaf3e0-ee5e-4443-9add-bb10afcc3b4d" />
+)
 
 ---
 
