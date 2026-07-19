@@ -10,7 +10,7 @@ const AppLayout = () => {
         <Outlet />
       </main>
       <div className="p-10 text-center bg-gray-800 mt-10">
-        © 2024 Made by Abhinav Srivastava to get replies from companies.
+        © 2024 Made by Abhinav Srivastava to get hired.
       </div>
     </div>
   );
