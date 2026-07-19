@@ -15,8 +15,17 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Link } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
 
 const LandingPage = () => {
+  const { user, isLoaded } = useUser();
+
+  const handleRoleSelection = async (role) => {
+    if (user) {
+      await user.update({ unsafeMetadata: { role } });
+    }
+  };
+
   return (
     <main className="flex flex-col gap-10 sm:gap-20 py-10 sm:py-20">
       <section className="text-center ">
@@ -36,16 +45,48 @@ const LandingPage = () => {
         </p>
       </section>
       <div className="flex gap-6 justify-center">
-        <Link to={"/jobs"}>
-          <Button variant="blue" size="xl">
-            Find Jobs
-          </Button>
-        </Link>
-        <Link to={"/post-job"}>
-          <Button variant="destructive" size="xl">
-            Post a Job
-          </Button>
-        </Link>
+        {isLoaded && (!user?.unsafeMetadata?.role || user.unsafeMetadata.role === "candidate") && (
+          <Link to={"/jobs"}>
+            <Button
+              variant="blue"
+              size="xl"
+              onClick={() => {
+                localStorage.setItem("intended_role", "candidate");
+                if (user && !user.unsafeMetadata?.role) {
+                  handleRoleSelection("candidate");
+                }
+              }}
+            >
+              Find Jobs
+            </Button>
+          </Link>
+        )}
+        {isLoaded && (!user?.unsafeMetadata?.role || user.unsafeMetadata.role === "recruiter") && (
+          <Link to={"/post-job"}>
+            <Button
+              variant="destructive"
+              size="xl"
+              onClick={() => {
+                localStorage.setItem("intended_role", "recruiter");
+                if (user && !user.unsafeMetadata?.role) {
+                  handleRoleSelection("recruiter");
+                }
+              }}
+            >
+              Post a Job
+            </Button>
+          </Link>
+        )}
+        {!isLoaded && (
+          <>
+            <Button variant="blue" size="xl" disabled>
+              Find Jobs
+            </Button>
+            <Button variant="destructive" size="xl" disabled>
+              Post a Job
+            </Button>
+          </>
+        )}
       </div>
       <Carousel
         plugins={[

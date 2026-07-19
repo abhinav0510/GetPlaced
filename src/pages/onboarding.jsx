@@ -27,6 +27,12 @@ const Onboarding = () => {
   useEffect(() => {
     if (user?.unsafeMetadata?.role) {
       navigateUser(user.unsafeMetadata.role);
+    } else if (user) {
+      const intendedRole = localStorage.getItem("intended_role");
+      if (intendedRole === "candidate" || intendedRole === "recruiter") {
+        handleRoleSelection(intendedRole);
+        localStorage.removeItem("intended_role");
+      }
     }
   }, [user]);
 

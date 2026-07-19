@@ -1,26 +1,30 @@
 [
   {
-    "question": "What is getPlaced?",
-    "answer": "Hirrd is a Job Portal Application allows companies to post job listings and users to search and apply for jobs. It provides features for both job seekers and employers, with user-friendly interfaces and secure authentication."
+    "question": "What frontend framework and build tool does getPlaced use?",
+    "answer": "getPlaced is built using React 18 as the user interface library and Vite as the fast build tool and development server."
   },
   {
-    "question": "How do I post a job?",
-    "answer": "As an employer, you can post a job by navigating to the 'Post Job' section after logging in. Fill in the job details and submit the form to create a new job listing."
+    "question": "What database and storage services are used?",
+    "answer": "The project utilizes Supabase as its Backend-as-a-Service (BaaS). It uses a PostgreSQL database to manage companies, jobs, applications, and saved jobs, and Supabase Storage buckets to host candidate resumes and company logos."
   },
   {
-    "question": "How can I search for jobs?",
-    "answer": "Job seekers can search for jobs by keywords, location, category, and other filters using the search bar on the homepage or the dedicated job search page."
+    "question": "How is user authentication managed?",
+    "answer": "Authentication is powered by Clerk, which handles secure sign-ups, logins, Google OAuth, and passwordless authentication. A custom JWT template is used to securely connect Clerk with Supabase."
   },
   {
-    "question": "How do I apply for a job?",
-    "answer": "To apply for a job, click on the job listing and follow the application instructions provided. You may need to upload your resume and provide additional information."
+    "question": "What tools are used for styling and user interface components?",
+    "answer": "The application's premium, responsive interface is styled using Tailwind CSS and structured with Shadcn UI, a library of customizable Radix-UI primitive components."
   },
   {
-    "question": "Can I save jobs to apply later?",
-    "answer": "Yes, you can save job listings by clicking the 'Save Job' button on the job listing. Saved jobs can be accessed from your profile under the 'Saved Jobs' section."
+    "question": "How are forms and user inputs validated?",
+    "answer": "Forms, such as the job application and creation flows, are managed using React Hook Form and validated client-side with Zod schema validation."
   },
   {
-    "question": "How do I track my job applications?",
-    "answer": "Job seekers can track the status of their applications from the 'Applications' section in their profile. This section provides updates on the progress of each application."
+    "question": "How are job descriptions formatted by recruiters?",
+    "answer": "Recruiters can use a rich markdown text editor powered by `@uiw/react-md-editor` to write, format, and preview job requirements and responsibilities."
+  },
+  {
+    "question": "How is client-side navigation managed?",
+    "answer": "Client-side routing is handled by React Router v6, which enables seamless page navigation without full-page reloads."
   }
 ]
