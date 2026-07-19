@@ -19,6 +19,7 @@ const useFetch = (cb, options = {}) => {
       const response = await cb(supabaseAccessToken, options, ...args);
       setData(response);
       setError(null);
+      return response;
     } catch (error) {
       setError(error);
     } finally {

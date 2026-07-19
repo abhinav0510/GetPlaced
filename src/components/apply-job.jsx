@@ -65,9 +65,11 @@ export function ApplyJobDrawer({ user, job, fetchJob, applied = false }) {
       name: user.fullName,
       status: "applied",
       resume: data.resume[0],
-    }).then(() => {
-      fetchJob();
-      reset();
+    }).then((res) => {
+      if (res) {
+        fetchJob();
+        reset();
+      }
     });
   };
 
