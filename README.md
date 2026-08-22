@@ -150,12 +150,6 @@ npm run dev
 The application will launch locally at `http://localhost:5173/` (or another port specified in the console).
 
 ---
-
-## ☁️ Deployment
-
-### Live Deployment on Vercel
-This project includes a pre-configured `vercel.json` file which routes all paths back to the React SPA frontend to avoid `404 Not Found` errors when users refresh deep pages.
-
 1. Push your repository to **GitHub**.
 2. Go to **[Vercel](https://vercel.com)**, import your project repository, and add the three environment variables from your `.env` file under project settings.
 3. Click **Deploy**.
