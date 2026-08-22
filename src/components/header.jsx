@@ -1,92 +1,115 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import {
-  SignedIn,
-  SignedOut,
-  UserButton,
-  SignIn,
-  useUser,
-} from "@clerk/clerk-react";
 import { Button } from "./ui/button";
-import { BriefcaseBusiness, Heart, PenBox } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { Briefcase, PenBox, User, LogOut, Bookmark, FileText } from "lucide-react";
+import AuthModal from "./auth-modal";
 
 const Header = () => {
-  const [showSignIn, setShowSignIn] = useState(false);
-
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [search, setSearch] = useSearchParams();
-  const { user } = useUser();
+  const { user, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (search.get("sign-in")) {
-      setShowSignIn(true);
+    if (search.get("sign-in") === "true") {
+      setShowAuthModal(true);
     }
   }, [search]);
 
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      setShowSignIn(false);
-      setSearch({});
-    }
-  };
-
   return (
     <>
-      <nav className="py-4 flex justify-between items-center">
+      <nav className="py-4 flex justify-between items-center transition-colors duration-300">
         <Link to="/">
-          <img src="/logo.png" className="h-20" alt="Hirrd Logo" />
+          <img src="/logo.png" className="h-12 sm:h-16 object-contain" alt="getPlaced Logo" />
         </Link>
 
-        <div className="flex gap-8">
-          <SignedOut>
-            <Button variant="outline" onClick={() => setShowSignIn(true)}>
+        <div className="flex gap-3 sm:gap-4 items-center">
+          <Link to="/jobs">
+            <button className="flex items-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-medium px-4 py-2 rounded-xl text-sm transition-all shadow-xs cursor-pointer">
+              <Briefcase size={17} className="text-blue-600" />
+              View Jobs
+            </button>
+          </Link>
+
+          {user?.unsafeMetadata?.role === "recruiter" && (
+            <Link to="/post-job">
+              <button className="flex items-center gap-2 bg-slate-950 hover:bg-slate-900 text-white font-medium px-4 py-2 rounded-xl text-sm transition-all shadow-sm cursor-pointer">
+                <PenBox size={17} className="text-blue-400" />
+                Post a Job
+              </button>
+            </Link>
+          )}
+
+          {!user ? (
+            <Button
+              variant="outline"
+              onClick={() => setShowAuthModal(true)}
+              className="rounded-xl border-blue-600 text-blue-700 hover:bg-blue-50 font-semibold text-xs sm:text-sm px-5 py-2 cursor-pointer"
+            >
               Login
             </Button>
-          </SignedOut>
-          <SignedIn>
-            {user?.unsafeMetadata?.role === "recruiter" && (
-              <Link to="/post-job">
-                <Button variant="destructive" className="rounded-full">
-                  <PenBox size={20} className="mr-2" />
-                  Post a Job
-                </Button>
-              </Link>
-            )}
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "w-10 h-10",
-                },
-              }}
-            >
-              <UserButton.MenuItems>
-                <UserButton.Link
-                  label="My Jobs"
-                  labelIcon={<BriefcaseBusiness size={15} />}
-                  href="/my-jobs"
-                />
-                <UserButton.Link
-                  label="Saved Jobs"
-                  labelIcon={<Heart size={15} />}
-                  href="/saved-jobs"
-                />
-                <UserButton.Action label="manageAccount" />
-              </UserButton.MenuItems>
-            </UserButton>
-          </SignedIn>
+          ) : (
+            <div className="relative">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="w-10 h-10 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shadow-md shadow-blue-500/20 hover:opacity-90 transition-all cursor-pointer"
+              >
+                {user.name ? user.name.charAt(0).toUpperCase() : <User size={18} />}
+              </button>
+
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-fade-in-up">
+                  <div className="px-4 py-2 border-b border-slate-100">
+                    <p className="text-sm font-semibold text-slate-900 truncate">{user.name}</p>
+                    <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                    <span className="inline-block mt-1 px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-md capitalize">
+                      {user.unsafeMetadata?.role || "candidate"}
+                    </span>
+                  </div>
+
+                  <Link
+                    to="/my-jobs"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <FileText size={15} className="text-slate-400" />
+                    {user.unsafeMetadata?.role === "recruiter" ? "My Jobs" : "My Applications"}
+                  </Link>
+
+                  <Link
+                    to="/saved-jobs"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <Bookmark size={15} className="text-slate-400" />
+                    Saved Jobs
+                  </Link>
+
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      logout();
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors text-left border-t border-slate-100 mt-1 cursor-pointer"
+                  >
+                    <LogOut size={15} />
+                    Log Out
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </nav>
 
-      {showSignIn && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-          onClick={handleOverlayClick}
-        >
-          <SignIn
-            signUpForceRedirectUrl="/onboarding"
-            fallbackRedirectUrl="/onboarding"
-          />
-        </div>
-      )}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => {
+          setShowAuthModal(false);
+          setSearch({});
+        }}
+      />
     </>
   );
 };

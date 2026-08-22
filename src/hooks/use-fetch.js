@@ -1,4 +1,4 @@
-import { useSession } from "@clerk/clerk-react";
+import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 
 const useFetch = (cb, options = {}) => {
@@ -6,17 +6,14 @@ const useFetch = (cb, options = {}) => {
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(null);
 
-  const { session } = useSession();
+  const { token } = useAuth();
 
   const fn = async (...args) => {
     setLoading(true);
     setError(null);
 
     try {
-      const supabaseAccessToken = await session.getToken({
-        template: "supabase",
-      });
-      const response = await cb(supabaseAccessToken, options, ...args);
+      const response = await cb(token, options, ...args);
       setData(response);
       setError(null);
       return response;
@@ -31,3 +28,4 @@ const useFetch = (cb, options = {}) => {
 };
 
 export default useFetch;
+

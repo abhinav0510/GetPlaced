@@ -11,7 +11,7 @@ import {
 import { Link } from "react-router-dom";
 import useFetch from "@/hooks/use-fetch";
 import { deleteJob, saveJob } from "@/api/apiJobs";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { BarLoader } from "react-spinners";
 
@@ -23,7 +23,7 @@ const JobCard = ({
 }) => {
   const [saved, setSaved] = useState(savedInit);
 
-  const { user } = useUser();
+  const { user } = useAuth();
 
   const { loading: loadingDeleteJob, fn: fnDeleteJob } = useFetch(deleteJob, {
     job_id: job.id,

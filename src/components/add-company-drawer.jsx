@@ -17,6 +17,7 @@ import useFetch from "@/hooks/use-fetch";
 import { addNewCompany } from "@/api/apiCompanies";
 import { BarLoader } from "react-spinners";
 import { useEffect } from "react";
+import { Plus } from "lucide-react";
 
 const schema = z.object({
   name: z.string().min(1, { message: "Company name is required" }),
@@ -25,7 +26,7 @@ const schema = z.object({
     .refine(
       (file) =>
         file[0] &&
-        (file[0].type === "image/png" || file[0].type === "image/jpeg"),
+        (file[0].type === "image/png" || file[0].type === "image/jpeg" || file[0].type === "image/webp" || file[0].type === "image/svg+xml"),
       {
         message: "Only Images are allowed",
       }
@@ -63,24 +64,28 @@ const AddCompanyDrawer = ({ fetchCompanies }) => {
 
   return (
     <Drawer>
-      <DrawerTrigger>
-        <Button type="button" size="sm" variant="secondary">
+      <DrawerTrigger asChild>
+        <button
+          type="button"
+          className="bg-blue-50/80 hover:bg-blue-100 text-blue-600 font-semibold px-4 py-3 rounded-xl border border-blue-100 flex items-center gap-1.5 text-sm transition-all whitespace-nowrap cursor-pointer shadow-2xs"
+        >
+          <Plus size={18} />
           Add Company
-        </Button>
+        </button>
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent className="bg-white text-slate-900 border-slate-200">
         <DrawerHeader>
-          <DrawerTitle>Add a New Company</DrawerTitle>
+          <DrawerTitle className="text-slate-900 font-bold text-lg">Add a New Company</DrawerTitle>
         </DrawerHeader>
-        <form className="flex gap-2 p-4 pb-0">
+        <form className="flex flex-col sm:flex-row gap-3 p-4 pb-0">
           {/* Company Name */}
-          <Input placeholder="Company name" {...register("name")} />
+          <Input placeholder="Company name" className="bg-white border-slate-200 text-slate-900 placeholder:text-slate-400" {...register("name")} />
 
           {/* Company Logo */}
           <Input
             type="file"
             accept="image/*"
-            className=" file:text-gray-500"
+            className="bg-white border-slate-200 text-slate-900 file:text-slate-700"
             {...register("logo")}
           />
 
@@ -88,21 +93,21 @@ const AddCompanyDrawer = ({ fetchCompanies }) => {
           <Button
             type="button"
             onClick={handleSubmit(onSubmit)}
-            variant="destructive"
-            className="w-40"
+            variant="blue"
+            className="w-full sm:w-36 font-semibold"
           >
             Add
           </Button>
         </form>
         <DrawerFooter>
-          {errors.name && <p className="text-red-500">{errors.name.message}</p>}
-          {errors.logo && <p className="text-red-500">{errors.logo.message}</p>}
+          {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+          {errors.logo && <p className="text-red-500 text-xs">{errors.logo.message}</p>}
           {errorAddCompany?.message && (
-            <p className="text-red-500">{errorAddCompany?.message}</p>
+            <p className="text-red-500 text-xs">{errorAddCompany?.message}</p>
           )}
-          {loadingAddCompany && <BarLoader width={"100%"} color="#36d7b7" />}
+          {loadingAddCompany && <BarLoader width={"100%"} color="#2563eb" />}
           <DrawerClose asChild>
-            <Button type="button" variant="secondary">
+            <Button type="button" variant="outline" className="border-slate-200 text-slate-700">
               Cancel
             </Button>
           </DrawerClose>

@@ -1,10 +1,10 @@
 import CreatedApplications from "@/components/created-applications";
 import CreatedJobs from "@/components/created-jobs";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/context/AuthContext";
 import { BarLoader } from "react-spinners";
 
 const MyJobs = () => {
-  const { user, isLoaded } = useUser();
+  const { user, isLoaded } = useAuth();
 
   if (!isLoaded) {
     return <BarLoader className="mb-4" width={"100%"} color="#36d7b7" />;

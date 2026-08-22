@@ -1,38 +1,27 @@
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { BarLoader } from "react-spinners";
 
 const Onboarding = () => {
-  const { user, isLoaded } = useUser();
+  const { user, isLoaded } = useAuth();
   const navigate = useNavigate();
 
   const navigateUser = (currRole) => {
     navigate(currRole === "recruiter" ? "/post-job" : "/jobs");
   };
 
-  const handleRoleSelection = async (role) => {
-    await user
-      .update({ unsafeMetadata: { role } })
-      .then(() => {
-        console.log(`Role updated to: ${role}`);
-        navigateUser(role);
-      })
-      .catch((err) => {
-        console.error("Error updating role:", err);
-      });
+  const handleRoleSelection = (role) => {
+    if (user) {
+      user.unsafeMetadata = { role };
+    }
+    navigateUser(role);
   };
 
   useEffect(() => {
     if (user?.unsafeMetadata?.role) {
       navigateUser(user.unsafeMetadata.role);
-    } else if (user) {
-      const intendedRole = localStorage.getItem("intended_role");
-      if (intendedRole === "candidate" || intendedRole === "recruiter") {
-        handleRoleSelection(intendedRole);
-        localStorage.removeItem("intended_role");
-      }
     }
   }, [user]);
 
@@ -48,14 +37,14 @@ const Onboarding = () => {
       <div className="mt-16 grid grid-cols-2 gap-4 w-full md:px-40">
         <Button
           variant="blue"
-          className="h-36 text-2xl"
+          className="h-36 text-2xl cursor-pointer"
           onClick={() => handleRoleSelection("candidate")}
         >
           Candidate
         </Button>
         <Button
           variant="destructive"
-          className="h-36 text-2xl"
+          className="h-36 text-2xl cursor-pointer"
           onClick={() => handleRoleSelection("recruiter")}
         >
           Recruiter
@@ -66,3 +55,4 @@ const Onboarding = () => {
 };
 
 export default Onboarding;
+

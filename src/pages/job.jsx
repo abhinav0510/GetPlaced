@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { BarLoader } from "react-spinners";
 import MDEditor from "@uiw/react-md-editor";
 import { useParams } from "react-router-dom";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/context/AuthContext";
 import { Briefcase, DoorClosed, DoorOpen, MapPinIcon } from "lucide-react";
 
 import {
@@ -20,7 +20,7 @@ import { getSingleJob, updateHiringStatus } from "@/api/apiJobs";
 
 const JobPage = () => {
   const { id } = useParams();
-  const { isLoaded, user } = useUser();
+  const { isLoaded, user } = useAuth();
 
   const {
     loading: loadingJob,
