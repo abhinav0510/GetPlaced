@@ -24,6 +24,10 @@ public class Company {
     @Column(nullable = false)
     private String logoUrl;
 
+    private String branches;
+
+    private String industryType;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

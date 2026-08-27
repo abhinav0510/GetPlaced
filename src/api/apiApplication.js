@@ -4,7 +4,12 @@ import { apiFetch, getFileUrl } from "./apiClient";
 export async function applyToJob(token, _, jobData) {
   const formData = new FormData();
   formData.append("jobId", jobData.job_id);
-  formData.append("resume", jobData.resume);
+  if (jobData.resume) {
+    formData.append("resume", jobData.resume);
+  }
+  if (jobData.resumeUrl) {
+    formData.append("resumeUrl", jobData.resumeUrl);
+  }
   if (jobData.skills) formData.append("skills", jobData.skills);
   if (jobData.experience) formData.append("experience", jobData.experience);
   if (jobData.education) formData.append("education", jobData.education);

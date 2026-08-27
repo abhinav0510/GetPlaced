@@ -18,6 +18,10 @@ public class JobRequest {
     @NotBlank(message = "Location is required")
     private String location;
 
+    private String salary;
+
+    private String experience;
+
     @NotNull(message = "Company ID is required")
     private Long companyId;
 

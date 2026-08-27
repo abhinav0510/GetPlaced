@@ -21,12 +21,13 @@ public class ApplicationController {
 
     @PostMapping
     public ResponseEntity<Application> applyToJob(@RequestParam("jobId") Long jobId,
-                                                   @RequestParam("resume") MultipartFile resume,
+                                                   @RequestParam(value = "resume", required = false) MultipartFile resume,
+                                                   @RequestParam(value = "resumeUrl", required = false) String existingResumeUrl,
                                                    @RequestParam(value = "skills", required = false) String skills,
                                                    @RequestParam(value = "experience", required = false) String experience,
                                                    @RequestParam(value = "education", required = false) String education,
                                                    @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok(applicationService.applyToJob(jobId, userPrincipal.getEmail(), resume, skills, experience, education));
+        return ResponseEntity.ok(applicationService.applyToJob(jobId, userPrincipal.getEmail(), resume, existingResumeUrl, skills, experience, education));
     }
 
     @PatchMapping("/{id}/status")

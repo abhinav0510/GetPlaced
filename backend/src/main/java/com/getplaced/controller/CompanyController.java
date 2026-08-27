@@ -23,7 +23,7 @@ public class CompanyController {
 
     @PostMapping
     public ResponseEntity<Company> addCompany(@RequestParam("name") String name,
-                                               @RequestParam("logo") MultipartFile logo) {
+                                               @RequestParam(value = "logo", required = false) MultipartFile logo) {
         return ResponseEntity.ok(companyService.addCompany(name, logo));
     }
 }

@@ -16,27 +16,32 @@ import { useForm } from "react-hook-form";
 import useFetch from "@/hooks/use-fetch";
 import { addNewCompany } from "@/api/apiCompanies";
 import { BarLoader } from "react-spinners";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 
 const schema = z.object({
   name: z.string().min(1, { message: "Company name is required" }),
   logo: z
     .any()
+    .optional()
     .refine(
       (file) =>
-        file[0] &&
-        (file[0].type === "image/png" || file[0].type === "image/jpeg" || file[0].type === "image/webp" || file[0].type === "image/svg+xml"),
+        !file ||
+        !file[0] ||
+        ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg+xml"].includes(file[0]?.type),
       {
-        message: "Only Images are allowed",
+        message: "Only image files (PNG, JPEG, WEBP, SVG) are allowed",
       }
     ),
 });
 
 const AddCompanyDrawer = ({ fetchCompanies }) => {
+  const [open, setOpen] = useState(false);
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
@@ -51,19 +56,22 @@ const AddCompanyDrawer = ({ fetchCompanies }) => {
 
   const onSubmit = async (data) => {
     fnAddCompany({
-      ...data,
-      logo: data.logo[0],
+      name: data.name,
+      logo: data.logo && data.logo[0] ? data.logo[0] : null,
     });
   };
 
   useEffect(() => {
-    if (dataAddCompany?.length > 0) {
+    if (dataAddCompany) {
       fetchCompanies();
+      reset();
+      setOpen(false);
     }
-  }, [loadingAddCompany]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataAddCompany]);
 
   return (
-    <Drawer>
+    <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <button
           type="button"
@@ -77,31 +85,35 @@ const AddCompanyDrawer = ({ fetchCompanies }) => {
         <DrawerHeader>
           <DrawerTitle className="text-slate-900 font-bold text-lg">Add a New Company</DrawerTitle>
         </DrawerHeader>
-        <form className="flex flex-col sm:flex-row gap-3 p-4 pb-0">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col sm:flex-row gap-3 p-4 pb-0">
           {/* Company Name */}
-          <Input placeholder="Company name" className="bg-white border-slate-200 text-slate-900 placeholder:text-slate-400" {...register("name")} />
+          <div className="flex-1">
+            <Input placeholder="Company name" className="bg-white border-slate-200 text-slate-900 placeholder:text-slate-400" {...register("name")} />
+            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+          </div>
 
           {/* Company Logo */}
-          <Input
-            type="file"
-            accept="image/*"
-            className="bg-white border-slate-200 text-slate-900 file:text-slate-700"
-            {...register("logo")}
-          />
+          <div className="flex-1">
+            <Input
+              type="file"
+              accept="image/*"
+              className="bg-white border-slate-200 text-slate-900 file:text-slate-700"
+              {...register("logo")}
+            />
+            {errors.logo && <p className="text-red-500 text-xs mt-1">{errors.logo.message}</p>}
+          </div>
 
           {/* Add Button */}
           <Button
-            type="button"
-            onClick={handleSubmit(onSubmit)}
+            type="submit"
+            disabled={loadingAddCompany}
             variant="blue"
             className="w-full sm:w-36 font-semibold"
           >
-            Add
+            {loadingAddCompany ? "Adding..." : "Add"}
           </Button>
         </form>
         <DrawerFooter>
-          {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
-          {errors.logo && <p className="text-red-500 text-xs">{errors.logo.message}</p>}
           {errorAddCompany?.message && (
             <p className="text-red-500 text-xs">{errorAddCompany?.message}</p>
           )}

@@ -22,20 +22,31 @@ public class ApplicationService {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
 
-    public Application applyToJob(Long jobId, String candidateEmail, MultipartFile resume, String skills, String experience, String education) {
+    public Application applyToJob(Long jobId, String candidateEmail, MultipartFile resume, String existingResumeUrl, String skills, String experience, String education) {
         User candidate = userRepository.findByEmail(candidateEmail)
                 .orElseThrow(() -> new RuntimeException("Candidate not found"));
 
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
 
-        String resumeUrl = fileStorageService.storeFile(resume, "resumes");
+        String finalResumeUrl = null;
+        if (resume != null && !resume.isEmpty()) {
+            finalResumeUrl = fileStorageService.storeFile(resume, "resumes");
+        } else if (existingResumeUrl != null && !existingResumeUrl.isBlank()) {
+            finalResumeUrl = existingResumeUrl;
+        } else if (candidate.getResumeUrl() != null && !candidate.getResumeUrl().isBlank()) {
+            finalResumeUrl = candidate.getResumeUrl();
+        }
+
+        if (finalResumeUrl == null || finalResumeUrl.isBlank()) {
+            throw new RuntimeException("Please upload a resume or select your profile resume to apply.");
+        }
 
         Application application = Application.builder()
                 .job(job)
                 .candidate(candidate)
                 .status(ApplicationStatus.APPLIED)
-                .resumeUrl(resumeUrl)
+                .resumeUrl(finalResumeUrl)
                 .skills(skills)
                 .experience(experience)
                 .education(education)

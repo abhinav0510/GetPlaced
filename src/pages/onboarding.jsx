@@ -9,7 +9,11 @@ const Onboarding = () => {
   const navigate = useNavigate();
 
   const navigateUser = (currRole) => {
-    navigate(currRole === "recruiter" ? "/post-job" : "/jobs");
+    if (!user?.profileCompleted) {
+      navigate("/my-profile?complete-profile=true");
+    } else {
+      navigate(currRole === "recruiter" ? "/post-job" : "/jobs");
+    }
   };
 
   const handleRoleSelection = (role) => {

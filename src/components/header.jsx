@@ -25,12 +25,14 @@ const Header = () => {
         </Link>
 
         <div className="flex gap-3 sm:gap-4 items-center">
-          <Link to="/jobs">
-            <button className="flex items-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-medium px-4 py-2 rounded-xl text-sm transition-all shadow-xs cursor-pointer">
-              <Briefcase size={17} className="text-blue-600" />
-              View Jobs
-            </button>
-          </Link>
+          {user?.unsafeMetadata?.role !== "recruiter" && (
+            <Link to="/jobs">
+              <button className="flex items-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-medium px-4 py-2 rounded-xl text-sm transition-all shadow-xs cursor-pointer">
+                <Briefcase size={17} className="text-blue-600" />
+                View Jobs
+              </button>
+            </Link>
+          )}
 
           {user?.unsafeMetadata?.role === "recruiter" && (
             <Link to="/post-job">
@@ -53,9 +55,15 @@ const Header = () => {
             <div className="relative">
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className="w-10 h-10 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shadow-md shadow-blue-500/20 hover:opacity-90 transition-all cursor-pointer"
+                className="w-10 h-10 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shadow-md shadow-blue-500/20 hover:opacity-90 transition-all cursor-pointer overflow-hidden border border-white/20"
               >
-                {user.name ? user.name.charAt(0).toUpperCase() : <User size={18} />}
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                ) : user.name ? (
+                  user.name.charAt(0).toUpperCase()
+                ) : (
+                  <User size={18} />
+                )}
               </button>
 
               {menuOpen && (
@@ -69,6 +77,20 @@ const Header = () => {
                   </div>
 
                   <Link
+                    to="/my-profile"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center justify-between px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <User size={15} className="text-slate-400" />
+                      My Profile
+                    </div>
+                    {user.unsafeMetadata?.role === "recruiter" && !user.profileCompleted && (
+                      <span className="w-2 h-2 rounded-full bg-amber-500" title="Profile Incomplete" />
+                    )}
+                  </Link>
+
+                  <Link
                     to="/my-jobs"
                     onClick={() => setMenuOpen(false)}
                     className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
@@ -77,14 +99,16 @@ const Header = () => {
                     {user.unsafeMetadata?.role === "recruiter" ? "My Jobs" : "My Applications"}
                   </Link>
 
-                  <Link
-                    to="/saved-jobs"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-                  >
-                    <Bookmark size={15} className="text-slate-400" />
-                    Saved Jobs
-                  </Link>
+                  {user.unsafeMetadata?.role !== "recruiter" && (
+                    <Link
+                      to="/saved-jobs"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      <Bookmark size={15} className="text-slate-400" />
+                      Saved Jobs
+                    </Link>
+                  )}
 
                   <button
                     onClick={() => {

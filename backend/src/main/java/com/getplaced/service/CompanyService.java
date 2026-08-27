@@ -20,7 +20,10 @@ public class CompanyService {
     }
 
     public Company addCompany(String name, MultipartFile logo) {
-        String logoUrl = fileStorageService.storeFile(logo, "logos");
+        String logoUrl = null;
+        if (logo != null && !logo.isEmpty()) {
+            logoUrl = fileStorageService.storeFile(logo, "logos");
+        }
 
         Company company = Company.builder()
                 .name(name)

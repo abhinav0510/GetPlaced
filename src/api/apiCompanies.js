@@ -14,7 +14,9 @@ export async function getCompanies() {
 export async function addNewCompany(token, _, companyData) {
   const formData = new FormData();
   formData.append("name", companyData.name);
-  formData.append("logo", companyData.logo);
+  if (companyData.logo) {
+    formData.append("logo", companyData.logo);
+  }
 
   const company = await apiFetch("/companies", {
     method: "POST",

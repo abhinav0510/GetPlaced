@@ -30,6 +30,10 @@ public class Job {
     @Column(nullable = false)
     private String location;
 
+    private String salary;
+
+    private String experience;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;

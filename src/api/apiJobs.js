@@ -56,6 +56,8 @@ export async function addNewJob(token, _, jobData) {
       description: jobData.description,
       requirements: jobData.requirements,
       location: jobData.location,
+      salary: jobData.salary,
+      experience: jobData.experience,
       companyId: Number(jobData.company_id),
       isOpen: jobData.isOpen !== undefined ? jobData.isOpen : true,
     }),

@@ -79,6 +79,31 @@ export const AuthProvider = ({ children }) => {
     return userObj;
   };
 
+  const refreshUser = async () => {
+    if (!token) return;
+    try {
+      const userData = await apiFetch("/auth/me");
+      setUser({
+        ...userData,
+        unsafeMetadata: {
+          role: userData.role?.toLowerCase() || "candidate",
+        },
+      });
+    } catch (err) {
+      console.error("Failed to refresh user:", err);
+    }
+  };
+
+  const updateUserState = (updatedUser) => {
+    setUser((prev) => ({
+      ...prev,
+      ...updatedUser,
+      unsafeMetadata: {
+        role: (updatedUser.role || prev?.role)?.toLowerCase() || "candidate",
+      },
+    }));
+  };
+
   const logout = () => {
     localStorage.removeItem("getplaced_token");
     setToken(null);
@@ -93,6 +118,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    refreshUser,
+    updateUserState,
     // Helper to get raw JWT token string for legacy custom fetchers
     getToken: async () => token,
   };

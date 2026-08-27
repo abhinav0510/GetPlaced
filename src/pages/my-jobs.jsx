@@ -7,21 +7,14 @@ const MyJobs = () => {
   const { user, isLoaded } = useAuth();
 
   if (!isLoaded) {
-    return <BarLoader className="mb-4" width={"100%"} color="#36d7b7" />;
+    return <BarLoader className="mb-4" width={"100%"} color="#2563eb" />;
   }
 
+  const isCandidate = user?.role === "candidate" || user?.unsafeMetadata?.role === "candidate";
+
   return (
-    <div>
-      <h1 className="gradient-title font-extrabold text-5xl sm:text-7xl text-center pb-8">
-        {user?.unsafeMetadata?.role === "candidate"
-          ? "My Applications"
-          : "My Jobs"}
-      </h1>
-      {user?.unsafeMetadata?.role === "candidate" ? (
-        <CreatedApplications />
-      ) : (
-        <CreatedJobs />
-      )}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
+      {isCandidate ? <CreatedApplications /> : <CreatedJobs />}
     </div>
   );
 };

@@ -1,6 +1,4 @@
-import { getCompanies } from "@/api/apiCompanies";
 import { addNewJob } from "@/api/apiJobs";
-import AddCompanyDrawer from "@/components/add-company-drawer";
 import {
   Select,
   SelectContent,
@@ -20,8 +18,12 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { BarLoader } from "react-spinners";
 import { z } from "zod";
 import {
+  ArrowRight,
+  Award,
   Briefcase,
   Building2,
+  CheckCircle2,
+  DollarSign,
   FileText,
   MapPin,
   Send,
@@ -36,14 +38,18 @@ const schema = z.object({
   title: z.string().min(1, { message: "Job title is required" }),
   description: z.string().min(1, { message: "Job description is required" }),
   location: z.string().min(1, { message: "Please select a location" }),
-  company_id: z.string().min(1, { message: "Please select or add a company" }),
+  company_id: z.string().optional(),
   requirements: z.string().min(1, { message: "Requirements are required" }),
+  salary: z.string().optional(),
+  experience: z.string().optional(),
 });
 
 const PostJob = () => {
   const { user, isLoaded } = useAuth();
   const navigate = useNavigate();
   const [draftSaved, setDraftSaved] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [countdown, setCountdown] = useState(3);
 
   // Add light theme class to document root on mount
   useEffect(() => {
@@ -70,11 +76,20 @@ const PostJob = () => {
       title: "",
       description: "",
       location: "",
-      company_id: "",
+      company_id: user?.company?.id ? String(user.company.id) : "",
       requirements: "",
+      salary: "",
+      experience: "",
     },
     resolver: zodResolver(schema),
   });
+
+  // Auto-set company_id when user profile is loaded
+  useEffect(() => {
+    if (user?.company?.id) {
+      setValue("company_id", String(user.company.id));
+    }
+  }, [user, setValue]);
 
   const descriptionValue = watch("description") || "";
   const wordCount = descriptionValue.trim() ? descriptionValue.trim().split(/\s+/).filter(Boolean).length : 0;
@@ -87,29 +102,34 @@ const PostJob = () => {
   } = useFetch(addNewJob);
 
   const onSubmit = (data) => {
+    const finalCompanyId = data.company_id || (user?.company?.id ? String(user.company.id) : "");
+    if (!finalCompanyId && !user?.company?.name) {
+      alert("Please complete your employer profile and set up your company before posting a job.");
+      return;
+    }
     fnCreateJob({
       ...data,
+      company_id: finalCompanyId,
       recruiter_id: user.id,
       isOpen: true,
     });
   };
 
   useEffect(() => {
-    if (dataCreateJob?.length > 0) navigate("/jobs");
-  }, [loadingCreateJob, dataCreateJob, navigate]);
-
-  const {
-    loading: loadingCompanies,
-    data: companies,
-    fn: fnCompanies,
-  } = useFetch(getCompanies);
-
-  useEffect(() => {
-    if (isLoaded) {
-      fnCompanies();
+    if (dataCreateJob) {
+      setShowSuccessModal(true);
+      const interval = setInterval(() => {
+        setCountdown((prev) => (prev > 1 ? prev - 1 : 1));
+      }, 1000);
+      const timer = setTimeout(() => {
+        navigate("/my-jobs");
+      }, 3000);
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timer);
+      };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded]);
+  }, [dataCreateJob, navigate]);
 
   const handleSaveDraft = () => {
     const formValues = watch();
@@ -118,7 +138,7 @@ const PostJob = () => {
     setTimeout(() => setDraftSaved(false), 3000);
   };
 
-  if (!isLoaded || loadingCompanies) {
+  if (!isLoaded) {
     return (
       <div className="py-12 px-4 max-w-7xl mx-auto">
         <BarLoader className="mb-4 rounded-full" width={"100%"} color="#2563eb" />
@@ -301,44 +321,81 @@ const PostJob = () => {
                 {errors.location && <p className="text-red-500 text-xs mt-1.5 font-medium">{errors.location.message}</p>}
               </div>
 
-              {/* Company */}
-              <div className="md:col-span-4">
+              {/* Company (Locked to Employer Profile) */}
+              <div className="md:col-span-7">
                 <label className="block text-sm font-semibold text-slate-900 mb-2">
-                  Company
+                  Company Name <span className="text-xs text-blue-600 font-medium ms-1">(Selected from Profile)</span>
                 </label>
-                <Controller
-                  name="company_id"
-                  control={control}
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full h-[48px] bg-white border-slate-200 text-slate-900 rounded-xl px-4 text-sm focus:ring-2 focus:ring-blue-500 shadow-2xs">
-                        <div className="flex items-center gap-2.5 text-slate-900 overflow-hidden">
-                          <Building2 size={18} className="text-slate-400 flex-shrink-0" />
-                          <SelectValue placeholder="Select or add a company">
-                            {field.value
-                              ? companies?.find((com) => com.id === Number(field.value))?.name
-                              : "Select or add a company"}
-                          </SelectValue>
-                        </div>
-                      </SelectTrigger>
-                      <SelectContent className="bg-white text-slate-900 border-slate-200">
-                        <SelectGroup>
-                          {companies?.map(({ name, id }) => (
-                            <SelectItem key={name} value={id}>
-                              {name}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.company_id && <p className="text-red-500 text-xs mt-1.5 font-medium">{errors.company_id.message}</p>}
+                {user?.company?.name ? (
+                  <div className="w-full h-[48px] bg-slate-50 border border-slate-200 rounded-xl px-4 flex items-center justify-between text-sm shadow-2xs">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      {user.company.logoUrl ? (
+                        <img
+                          src={user.company.logoUrl}
+                          alt={user.company.name}
+                          className="w-7 h-7 rounded-lg object-contain bg-white border border-slate-200 p-0.5 flex-shrink-0"
+                        />
+                      ) : (
+                        <Building2 size={18} className="text-blue-600 flex-shrink-0" />
+                      )}
+                      <span className="font-bold text-slate-900 truncate">{user.company.name}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 bg-white px-2.5 py-1 rounded-lg border border-slate-200/80 flex-shrink-0 shadow-2xs">
+                      <ShieldCheck size={14} className="text-emerald-500" />
+                      <span>Employer Profile</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 text-amber-800 text-xs font-medium">
+                      <Building2 size={16} className="text-amber-600 flex-shrink-0" />
+                      <span>No company linked to your recruiter profile.</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/my-profile?complete-profile=true")}
+                      className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg transition-all flex-shrink-0 cursor-pointer"
+                    >
+                      Set Company
+                    </button>
+                  </div>
+                )}
+                {errors.company_id && <p className="text-red-500 text-xs mt-1.5 font-medium">Company is missing. Please set your company in profile.</p>}
+              </div>
+            </div>
+
+            {/* ===== SALARY & EXPERIENCE ROW ===== */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start pt-2">
+              {/* Salary Range */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-900 mb-2">
+                  Salary Range
+                </label>
+                <div className="relative">
+                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input
+                    type="text"
+                    placeholder="e.g. $80,000 - $120,000 / year or 10-15 LPA"
+                    className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all shadow-2xs"
+                    {...register("salary")}
+                  />
+                </div>
               </div>
 
-              {/* Add Company Drawer */}
-              <div className="md:col-span-3 pt-0 md:pt-7">
-                <AddCompanyDrawer fetchCompanies={fnCompanies} />
+              {/* Experience Required */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-900 mb-2">
+                  Experience Required
+                </label>
+                <div className="relative">
+                  <Award className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input
+                    type="text"
+                    placeholder="e.g. 2 - 4 years or Mid-Senior Level"
+                    className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all shadow-2xs"
+                    {...register("experience")}
+                  />
+                </div>
               </div>
             </div>
 
@@ -379,6 +436,41 @@ const PostJob = () => {
         </div>
 
       </div>
+
+      {/* ===== SUCCESS POPUP MODAL ===== */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-8 relative shadow-2xl border border-slate-100 text-center animate-fade-in-up">
+            {/* Animated Green Tick Circle */}
+            <div className="w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-emerald-500/20 ring-8 ring-emerald-50">
+              <CheckCircle2 size={44} className="animate-bounce" />
+            </div>
+
+            <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">
+              Job Posted Successfully!
+            </h3>
+            <p className="text-slate-500 text-sm mb-6 leading-relaxed">
+              Your job opening <span className="font-semibold text-slate-800">"{watch("title") || "New Job"}"</span> has been posted and is now live.
+            </p>
+
+            {/* Actions */}
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={() => navigate("/my-jobs")}
+                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                View My Jobs
+                <ArrowRight size={18} />
+              </button>
+            </div>
+
+            <p className="text-slate-400 text-xs mt-4 font-medium">
+              Redirecting to your jobs in {countdown}s...
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

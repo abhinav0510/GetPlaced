@@ -11,6 +11,7 @@ import JobListing from "./pages/jobListing";
 import MyJobs from "./pages/my-jobs";
 import SavedJobs from "./pages/saved-jobs";
 import JobPage from "./pages/job";
+import MyProfile from "./pages/my-profile";
 
 import "./App.css";
 
@@ -27,6 +28,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Onboarding />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/my-profile",
+        element: (
+          <ProtectedRoute>
+            <MyProfile />
           </ProtectedRoute>
         ),
       },
@@ -48,6 +57,14 @@ const router = createBrowserRouter([
       },
       {
         path: "/my-jobs",
+        element: (
+          <ProtectedRoute>
+            <MyJobs />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/dashboard",
         element: (
           <ProtectedRoute>
             <MyJobs />

@@ -1,33 +1,18 @@
 import Header from "@/components/header";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 const AppLayout = () => {
-  const location = useLocation();
-  const isLightPage = location.pathname === "/" || location.pathname === "/post-job";
-
-  if (isLightPage) {
-    return (
-      <div style={{ background: '#f8fafc', minHeight: '100vh' }}>
-        <main className="min-h-screen">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Header />
-          </div>
-          <Outlet />
-        </main>
-      </div>
-    );
-  }
-
   return (
-    <div>
-      <div className="grid-background"></div>
-      <main className="min-h-screen container">
-        <Header />
+    <div className="bg-slate-50 min-h-screen text-slate-900 transition-colors duration-300">
+      <main className="min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Header />
+        </div>
         <Outlet />
       </main>
-      <div className="p-10 text-center bg-gray-800 mt-10">
-        © 2024 Made by Abhinav Srivastava to get hired.
-      </div>
+      <footer className="py-8 text-center bg-white border-t border-slate-200/80 text-slate-500 text-xs sm:text-sm font-medium mt-16 shadow-2xs">
+        © 2024 getPlaced — Connecting Talent to Opportunity.
+      </footer>
     </div>
   );
 };

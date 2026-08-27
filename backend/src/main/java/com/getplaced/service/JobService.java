@@ -33,14 +33,23 @@ public class JobService {
         User recruiter = userRepository.findByEmail(recruiterEmail)
                 .orElseThrow(() -> new RuntimeException("Recruiter not found"));
 
-        Company company = companyRepository.findById(request.getCompanyId())
-                .orElseThrow(() -> new RuntimeException("Company not found"));
+        Company company = recruiter.getCompany();
+        if (company == null) {
+            if (request.getCompanyId() != null) {
+                company = companyRepository.findById(request.getCompanyId())
+                        .orElseThrow(() -> new RuntimeException("Company not found"));
+            } else {
+                throw new RuntimeException("No company linked to recruiter profile. Please update your profile.");
+            }
+        }
 
         Job job = Job.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .requirements(request.getRequirements())
                 .location(request.getLocation())
+                .salary(request.getSalary())
+                .experience(request.getExperience())
                 .company(company)
                 .recruiter(recruiter)
                 .isOpen(request.getIsOpen() != null ? request.getIsOpen() : true)

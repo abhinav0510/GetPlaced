@@ -36,6 +36,38 @@ public class User {
 
     private String avatarUrl;
 
+    private String designation;
+
+    private String companyEmail;
+
+    private String jobId;
+
+    @Column(columnDefinition = "TEXT")
+    private String education;
+
+    @Column(columnDefinition = "TEXT")
+    private String experiences;
+
+    private String location;
+
+    private String currentOrganization;
+
+    private String currentCtc;
+
+    private String expectedCtc;
+
+    @Column(columnDefinition = "TEXT")
+    private String interests;
+
+    private String resumeUrl;
+
+    @Builder.Default
+    private Boolean profileCompleted = false;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "company_id")
+    private Company company;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 }
